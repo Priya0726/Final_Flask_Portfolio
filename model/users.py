@@ -83,15 +83,16 @@ class User(db.Model):
 
     # Defines a relationship between User record and Notes table, one-to-many (one user to many notes)
     posts = db.relationship("Post", cascade='all, delete', backref='users', lazy=True)
-
+    _response=db.Column(db.String(255), unique=False, nullable=False)
     # constructor of a User object, initializes the instance variables within object (self)
-    def __init__(self, name, uid, password="123qwerty", dob=date.today(), hashmap={}, role="User"):
+    def __init__(self, name,uid,_response="None" , password="123qwerty", dob=date.today(), hashmap={}, role="User"):
         self._name = name    # variables with self prefix become part of the object, 
         self._uid = uid
         self.set_password(password)
         self._dob = dob
         self._hashmap = hashmap
         self._role = role
+        self._response=_response
 
     # a name getter method, extracts name from object
     @property
@@ -173,6 +174,11 @@ class User(db.Model):
     def is_admin(self):
         return self._role == "Admin"
 
+    def set_response(self, response):
+        self._response=response
+    
+    def get_response(self):
+        return self._response
     # CRUD create/add a new record to the table
     # returns self or None on error
     def create(self):
