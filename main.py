@@ -1,24 +1,51 @@
-from flask import Flask, request, jsonify, render_template
-import sqlite3
+import threading
+
 
 # import "packages" from flask
 from flask import render_template,request  # import render_template from "public" flask libraries
 from flask.cli import AppGroup
 
-# Function to establish connection with SQLite database
-def get_db_connection():
-    conn = sqlite3.connect('journal.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+
+
 
 # import "packages" from "this" project
 from __init__ import app, db, cors  # Definitions initialization
 
-# Endpoint to retrieve all journal entries
-@app.route('/entries', methods=['GET'])
-def get_entries():
-    # Existing code for retrieving journal entries
-    pass
+
+
+
+# setup APIs
+from api.covid import covid_api # Blueprint import api definition
+from api.joke import joke_api # Blueprint import api definition
+from api.user import user_api # Blueprint import api definition
+from api.player import player_api
+# database migrations
+from model.users import initUsers
+from model.players import initPlayers
+
+
+# setup App pages
+from projects.projects import app_projects # Blueprint directory import projects definition
+
+
+
+
+# import "packages" from flask
+from flask import render_template,request  # import render_template from "public" flask libraries
+from flask.cli import AppGroup
+# Initialize the SQLAlchemy object to work with the Flask app instance
+db.init_app(app)
+
+
+# import "packages" from "this" project
+from __init__ import app, db, cors  # Definitions initialization
+# register URIs
+app.register_blueprint(joke_api) # register api routes
+app.register_blueprint(covid_api) # register api routes
+app.register_blueprint(user_api) # register api routes
+app.register_blueprint(player_api)
+app.register_blueprint(app_projects) # register app pages
+
 
 # setup APIs
 from api.covid import covid_api # Blueprint import api definition
@@ -44,12 +71,21 @@ app.register_blueprint(player_api)
 app.register_blueprint(app_projects) # register app pages
 
 @app.errorhandler(404)  # catch for URL not found
+@app.errorhandler(404)  # catch for URL not found
 def page_not_found(e):
+    # note that we set the 404 status explicitly
     return render_template('404.html'), 404
 
 @app.route('/')  # connects default URL to index() function
+
+@app.route('/')  # connects default URL to index() function
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
+
+
+@app.route('/table/')  # connects /stub/ URL to stub() function
+def table():
+    return render_template("table.html")
 
 @app.route('/table/')  # connects /stub/ URL to stub() function
 def table():
@@ -78,3 +114,6 @@ app.cli.add_command(custom_cli)
 if __name__ == "__main__":
     # change name for testing
     app.run(debug=True, host="0.0.0.0", port="8086")
+    # change name for testing
+    app.run(debug=True, host="0.0.0.0", port="8086")
+
